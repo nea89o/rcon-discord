@@ -1,6 +1,5 @@
 package de.romjaki.discordrcon;
 
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -8,8 +7,6 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
 import java.io.IOException;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class RconEventListener extends ListenerAdapter {
     @Override
@@ -26,57 +23,71 @@ public class RconEventListener extends ListenerAdapter {
             return;
         }
         if (arr.length < 2) {
-            event.getChannel().sendMessage(
-                    new EmbedBuilder()
-                            .setColor(Color.RED)
-                            .setTitle("Missing an argument")
-                            .setDescription(String.format("Usage: %s <user>", arr[0]))
-                            .build())
-                    .queue(msg -> msg.delete().queueAfter(10, SECONDS));
+            Util.sendEmbed(event.getChannel(), "Missing an argument",
+                    String.format("Usage: %s <user>", arr[0]), Color.RED, event.getAuthor());
             return;
         }
         if (arr[0].equals("/adduser")) {
-            proccessMessage(event, "add", "added", arr[1]);
+            addUser(event, arr[1]);
         }
         if (arr[0].equals("/removeuser")) {
             if (!Util.isUserAdmin(event.getAuthor())) {
                 sendPermissionMessage(event.getChannel(), event.getAuthor());
                 return;
             }
-            proccessMessage(event, "remove", "removed", arr[1]);
+            removeUser(event, arr[1]);
         }
 
     }
 
     private void sendPermissionMessage(MessageChannel channel, User author) {
-        channel.sendMessage(
-                new EmbedBuilder()
-                        .setColor(Color.RED)
-                        .setTitle("You are lacking permissions")
-                        .setThumbnail(author.getAvatarUrl())
-                        .setDescription("You need to be an admin in order to perform that command.")
-                        .build())
-                .queue(msg -> msg.delete().queueAfter(10, SECONDS));
+        Util.sendEmbed(channel, "You are lacking permissions",
+                "You need to be an admin in order to perform that command.", Color.RED, author);
     }
 
-    private void proccessMessage(MessageReceivedEvent event, String action, String actioned, String name) {
+    private void addUser(MessageReceivedEvent event, String name) {
+        if (UserMapping.hasMinecraftUserAsociated(event.getAuthor())) {
+            String oldAccount = UserMapping.replaceMinecraftUserName(event.getAuthor(), name);
+            if (UserMapping.isInUse(oldAccount)) {
+                Util.sendEmbed(event.getChannel(), "Your old minecraft account is still in use.",
+                        String.format("Your old minecraft account `%s` is still in use " +
+                                "and will stay whitelisted.", oldAccount), Color.BLUE, event.getAuthor());
+            } else {
+                try {
+                    Util.whitelist("remove", oldAccount);
+                    Util.sendEmbed(event.getChannel(), "Replacing minecraft account",
+                            String.format("Your old minecraft account `%s` will be removed", name),
+                            Color.blue, event.getAuthor());
+                } catch (IOException e) {
+                    showIOErrorMessage(event.getChannel(), event.getAuthor());
+                    e.printStackTrace();
+                }
+            }
+        }
         try {
-            Util.whitelist(action, name);
+            Util.whitelist("add", name);
+            Util.sendEmbed(event.getChannel(), "Your minecraft account has whitelisted",
+                    String.format("Your minecraft account `%s` has been whitelisted.", name),
+                    Color.GREEN, event.getAuthor());
         } catch (IOException e) {
-            event.getChannel().sendMessage(
-                    new EmbedBuilder()
-                            .setColor(Color.RED)
-                            .setTitle("Unknown Network error occured")
-                            .setDescription("Check your console.")
-                            .build())
-                    .queue(msg -> msg.delete().queueAfter(10, SECONDS));
+            showIOErrorMessage(event.getChannel(), event.getAuthor());
             e.printStackTrace();
         }
-        event.getChannel().sendMessage(
-                new EmbedBuilder()
-                        .setColor(Color.GREEN)
-                        .setTitle(String.format("Successfully %s User %s", actioned, name))
-                        .build()
-        ).queue(msg -> msg.delete().queueAfter(10, SECONDS));
+    }
+
+    private void showIOErrorMessage(MessageChannel channel, User author) {
+        Util.sendEmbed(channel, "Unknown Network error occured", "Check your console.",
+                Color.RED, author);
+    }
+
+    private void removeUser(MessageReceivedEvent event, String name) {
+        try {
+            Util.whitelist("remove", name);
+        } catch (IOException e) {
+            showIOErrorMessage(event.getChannel(), event.getAuthor());
+            e.printStackTrace();
+        }
+        Util.sendEmbed(event.getChannel(), String.format("Successfully removed User %s", name), "",
+                Color.GREEN, event.getAuthor());
     }
 }
