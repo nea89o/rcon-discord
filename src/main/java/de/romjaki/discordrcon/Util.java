@@ -26,6 +26,13 @@ public class Util {
     }
 
     @PublicAPI
+    public static void sendPermissionMessage(MessageChannel channel, User author) {
+        sendEmbed(channel, "You are lacking permissions",
+                "You need to be an admin in order to perform that command.", Color.RED, author);
+    }
+
+
+    @PublicAPI
     public static boolean isUserAdmin(User user) {
         return Config.admins.contains(user.getId());
     }
@@ -34,5 +41,11 @@ public class Util {
     public static void whitelist(String action, String name) throws IOException {
         Main.rcon.command(String.format("whitelist %s %s", action, name));
         Main.rcon.command("whitelist reload");
+    }
+
+    @PublicAPI
+    public static void showIOErrorMessage(MessageChannel channel, User author) {
+        Util.sendEmbed(channel, "Unknown Network error occured", "Check your console.",
+                Color.RED, author);
     }
 }

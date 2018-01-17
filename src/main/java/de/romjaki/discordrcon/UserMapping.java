@@ -4,16 +4,34 @@ import net.dv8tion.jda.core.entities.User;
 import org.json.JSONObject;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserMapping {
     private static final File mappingFile = new File("users.json");
     private static Map<String, String> discordIdToMinecraftUserName = new HashMap<>();
 
+    static {
+        load();
+        Runtime.getRuntime().addShutdownHook(new Thread(UserMapping::save));
+    }
+
     private UserMapping() {
 
+    }
+
+    private static void save() {
+        JSONObject object = new JSONObject();
+        discordIdToMinecraftUserName.forEach(object::put);
+        String json = object.toString();
+        try (PrintWriter writer = new PrintWriter(mappingFile)) {
+            writer.append(json);
+        } catch (FileNotFoundException e) {
+            System.err.println("Failed to save users.json DUMP: ");
+            System.err.println();
+            System.err.println(json);
+            System.err.println();
+        }
     }
 
     @PublicAPI
@@ -43,10 +61,13 @@ public class UserMapping {
 
     @PublicAPI
     public static String replaceMinecraftUserName(String id, String newUsername) {
-        return discordIdToMinecraftUserName.put(id, newUsername);
+        String put = discordIdToMinecraftUserName.put(id, newUsername);
+        save();
+        return put;
     }
 
-    public static void load() {
+
+    private static void load() {
         try (Scanner s = new Scanner(mappingFile).useDelimiter("\\A")) {
             loads(s.next());
         } catch (FileNotFoundException e) {
@@ -74,5 +95,29 @@ public class UserMapping {
     @PublicAPI
     public static boolean isInUse(String account) {
         return discordIdToMinecraftUserName.containsValue(account);
+    }
+
+    @PublicAPI
+    public static void unbindAll(String name) {
+        for (String id : discordIdToMinecraftUserName.keySet()) {
+            if (name.equals(discordIdToMinecraftUserName.get(id))) {
+                discordIdToMinecraftUserName.remove(id);
+            }
+        }
+    }
+
+    public static List<String> getIdsByAccount(String account) {
+        return discordIdToMinecraftUserName.entrySet().stream()
+                .filter(entry -> Objects.equals(entry.getValue(), account))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+    public static String removeUserName(User user) {
+        return removeUserName(user.getId());
+    }
+
+    private static String removeUserName(String id) {
+        return discordIdToMinecraftUserName.remove(id);
     }
 }

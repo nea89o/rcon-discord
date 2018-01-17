@@ -13,7 +13,8 @@ import java.lang.annotation.Target;
         ElementType.ANNOTATION_TYPE,
         ElementType.CONSTRUCTOR,
         ElementType.METHOD,
-        ElementType.TYPE
+        ElementType.TYPE,
+        ElementType.FIELD
 })
 @PublicAPI
 public @interface PublicAPI {
