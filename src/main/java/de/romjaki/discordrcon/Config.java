@@ -20,6 +20,7 @@ public class Config {
     public static List<String> admins;
     public static boolean selfInvite;
     public static List<String> selfInviteRoles;
+    public static String prefix;
 
     static {
         try (Scanner s = new Scanner(new File("config.json")).useDelimiter("\\A")) {
@@ -33,6 +34,7 @@ public class Config {
         password = rcon.getString("password");
         discord = config.getJSONObject("discord");
         token = discord.getString("token");
+        prefix = discord.getString("prefix");
         JSONArray temp = discord.getJSONArray("admins");
         admins = new ArrayList<>();
 

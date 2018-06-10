@@ -2,17 +2,15 @@ package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static de.romjaki.discordrcon.UserMapping.isInUse;
 import static de.romjaki.discordrcon.UserMapping.removeUserName;
-import static de.romjaki.discordrcon.Util.sendEmbed;
 import static de.romjaki.discordrcon.Util.testUserRoles;
 
 public class RconEventListener extends ListenerAdapter {
@@ -47,7 +45,7 @@ public class RconEventListener extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         if (event.getAuthor().isBot()) {
             return;
         }
@@ -56,6 +54,9 @@ public class RconEventListener extends ListenerAdapter {
             return;
         }
         String[] arr = content.toLowerCase().trim().split("\\s+", 2);
+        if(!arr[0].startsWith(Config.prefix)){
+            return;
+        }
         String commandName = arr[0].substring(1);
         if (!commands.keySet().contains(commandName)) {
             return;
