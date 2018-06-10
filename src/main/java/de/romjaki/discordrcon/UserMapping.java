@@ -1,15 +1,18 @@
 package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.entities.User;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.romjaki.discordrcon.Util.sendGET;
+
 public class UserMapping {
     private static final File mappingFile = new File("users.json");
-    private static Map<String, String> discordIdToMinecraftUserName = new HashMap<>();
+    private static Map<String, UUID> discordIdToMinecraftUUUID = new HashMap<>();
 
     static {
         load();
@@ -22,7 +25,7 @@ public class UserMapping {
 
     private static void save() {
         JSONObject object = new JSONObject();
-        discordIdToMinecraftUserName.forEach(object::put);
+        discordIdToMinecraftUUUID.forEach(object::put);
         String json = object.toString();
         try (PrintWriter writer = new PrintWriter(mappingFile)) {
             writer.append(json);
@@ -35,8 +38,42 @@ public class UserMapping {
     }
 
     @PublicAPI
+    public static String resolveUUID(UUID uuid) {
+        if (uuid == null) return null;
+        try {
+            JSONArray obj = new JSONArray(sendGET("https://api.mojang.com/user/profiles/" + removeDashes(uuid) + "/names"));
+            return obj.getJSONObject(obj.length() - 1).getString("name");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "[IOERROR]";
+        }
+    }
+
+    @PublicAPI
+    private static UUID insertDashes(String uuid) {
+        return UUID.fromString(uuid.replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+    }
+
+    @PublicAPI
+    private static String removeDashes(UUID uuid) {
+        return uuid.toString().replace("-", "");
+    }
+
+    @PublicAPI
+    public static UUID resolveMinecraftUser(String username) {
+        if (username == null) return null;
+        try {
+            JSONObject obj = new JSONObject(sendGET("https://api.mojang.com/users/profiles/minecraft/" + username));
+            return insertDashes(obj.getString("id"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @PublicAPI
     public static String getMinecraftUser(String discordId) {
-        return discordIdToMinecraftUserName.get(discordId);
+        return resolveUUID(discordIdToMinecraftUUUID.get(discordId));
     }
 
     @PublicAPI
@@ -51,7 +88,7 @@ public class UserMapping {
 
     @PublicAPI
     public static boolean hasMinecraftUserAsociated(String id) {
-        return discordIdToMinecraftUserName.containsKey(id);
+        return discordIdToMinecraftUUUID.containsKey(id);
     }
 
     @PublicAPI
@@ -61,9 +98,9 @@ public class UserMapping {
 
     @PublicAPI
     public static String replaceMinecraftUserName(String id, String newUsername) {
-        String put = discordIdToMinecraftUserName.put(id, newUsername);
+        UUID put = discordIdToMinecraftUUUID.put(id, resolveMinecraftUser(newUsername));
         save();
-        return put;
+        return resolveUUID(put);
     }
 
 
@@ -88,26 +125,29 @@ public class UserMapping {
     private static void loads(String json) {
         JSONObject object = new JSONObject(json);
         for (String id : object.keySet()) {
-            discordIdToMinecraftUserName.put(id, object.getString(id));
+            discordIdToMinecraftUUUID.put(id, UUID.fromString(object.getString(id)));
         }
     }
 
     @PublicAPI
     public static boolean isInUse(String account) {
-        return discordIdToMinecraftUserName.containsValue(account);
+        return discordIdToMinecraftUUUID.containsValue(resolveMinecraftUser(account));
     }
 
     @PublicAPI
     public static void unbindAll(String name) {
-        for (String id : discordIdToMinecraftUserName.keySet()) {
-            if (name.equals(discordIdToMinecraftUserName.get(id))) {
-                discordIdToMinecraftUserName.remove(id);
+        UUID account = resolveMinecraftUser(name);
+        if (account == null) return;
+        for (String id : discordIdToMinecraftUUUID.keySet()) {
+            if (account.equals(discordIdToMinecraftUUUID.get(id))) {
+                discordIdToMinecraftUUUID.remove(id);
             }
         }
     }
 
-    public static List<String> getIdsByAccount(String account) {
-        return discordIdToMinecraftUserName.entrySet().stream()
+    public static List<String> getIdsByAccount(String name) {
+        UUID account = resolveMinecraftUser(name);
+        return discordIdToMinecraftUUUID.entrySet().stream()
                 .filter(entry -> Objects.equals(entry.getValue(), account))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
@@ -118,6 +158,6 @@ public class UserMapping {
     }
 
     private static String removeUserName(String id) {
-        return discordIdToMinecraftUserName.remove(id);
+        return resolveUUID(discordIdToMinecraftUUUID.remove(id));
     }
 }

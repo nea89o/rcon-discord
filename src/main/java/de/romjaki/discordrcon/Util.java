@@ -6,15 +6,54 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Util {
+    private static final String USER_AGENT = "Mozilla/5.0";
+
     private Util() {
 
+    }
+
+    public static String sendGET(String url) throws IOException {
+        return sendRequest("GET", url);
+    }
+
+    public static String sendPOST(String url) throws IOException {
+        return sendRequest("POST", url);
+    }
+
+    private static String sendRequest(String method, String url) throws IOException {
+
+        URL obj = new URL(url);
+        HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+
+        con.setRequestMethod(method);
+        con.setRequestProperty("User-Agent", USER_AGENT);
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        return response.toString();
     }
 
     public static void sendEmbed(MessageChannel channel, String title, String description, Color color, User user) {
@@ -33,7 +72,6 @@ public class Util {
         sendEmbed(channel, "You are lacking permissions",
                 "You need special roles to perform that command.", Color.RED, author);
     }
-
 
     @PublicAPI
     public static boolean isUserAdmin(User user) {
