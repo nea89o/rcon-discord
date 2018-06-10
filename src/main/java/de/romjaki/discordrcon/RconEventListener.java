@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import static de.romjaki.discordrcon.UserMapping.isInUse;
 import static de.romjaki.discordrcon.UserMapping.removeUserName;
@@ -18,9 +19,9 @@ public class RconEventListener extends ListenerAdapter {
     public static Map<String, Command> commands = new HashMap<>();
 
     static {
-        commands.put("adduser", new AddUserCommand());
-        commands.put("queryuser", new QueryUser());
-        commands.put("removeuser", new RemoveUserCommand());
+        commands.put("link", new AddUserCommand());
+        commands.put("query", new QueryUser());
+        commands.put("unlink", new RemoveUserCommand());
     }
 
     @Override
@@ -54,7 +55,7 @@ public class RconEventListener extends ListenerAdapter {
             return;
         }
         String[] arr = content.toLowerCase().trim().split("\\s+", 2);
-        if(!arr[0].startsWith(Config.prefix)){
+        if (!arr[0].startsWith(Config.prefix)) {
             return;
         }
         String commandName = arr[0].substring(1);

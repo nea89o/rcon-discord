@@ -21,6 +21,7 @@ public class Config {
     public static boolean selfInvite;
     public static List<String> selfInviteRoles;
     public static String prefix;
+    public static String welcomeMessage;
 
     static {
         try (Scanner s = new Scanner(new File("config.json")).useDelimiter("\\A")) {
@@ -37,7 +38,7 @@ public class Config {
         prefix = discord.getString("prefix");
         JSONArray temp = discord.getJSONArray("admins");
         admins = new ArrayList<>();
-
+        welcomeMessage = discord.getString("welcomemessage");
         temp.forEach(o -> admins.add(o.toString()));
         selfInvite = config.getBoolean("selfinvite");
         temp = discord.getJSONArray("selfinviteroles");

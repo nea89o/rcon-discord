@@ -1,14 +1,14 @@
 package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.awt.*;
 import java.util.List;
 
 public class QueryUser implements Command {
     @Override
-    public void execute(MessageReceivedEvent event, String[] args) {
+    public void execute(GuildMessageReceivedEvent event, String[] args) {
         List<User> mentionedUsers = event.getMessage().getMentionedUsers();
         if (mentionedUsers.size() != 1) {
             Util.sendEmbed(event.getChannel(), "Please (only) mention one Person",

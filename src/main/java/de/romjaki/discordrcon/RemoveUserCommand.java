@@ -1,7 +1,7 @@
 package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.entities.IMentionable;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.awt.*;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import static de.romjaki.discordrcon.Util.sendEmbed;
 
 public class RemoveUserCommand implements Command {
     @Override
-    public void execute(MessageReceivedEvent event, String[] args) {
+    public void execute(GuildMessageReceivedEvent event, String[] args) {
         event.getMessage().getMentionedUsers().forEach(user -> {
             String accountName = UserMapping.removeUserName(user);
             if (accountName == null) {

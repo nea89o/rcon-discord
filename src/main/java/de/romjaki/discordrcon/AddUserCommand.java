@@ -1,6 +1,7 @@
 package de.romjaki.discordrcon;
 
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 import java.awt.*;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import static de.romjaki.discordrcon.Util.*;
 
 public class AddUserCommand implements Command {
     @Override
-    public void execute(MessageReceivedEvent event, String[] args) {
+    public void execute(GuildMessageReceivedEvent event, String[] args) {
         if (args.length < 2) {
             sendEmbed(event.getChannel(), "Missing an argument",
                     "Usage: adduser <user>", Color.RED, event.getAuthor());
@@ -22,6 +23,14 @@ public class AddUserCommand implements Command {
                     "You have already associated that minecraft account with your discord user",
                     Color.RED, event.getAuthor());
             return;
+        }
+        if (Config.welcomeMessage != null) {
+            event.getChannel()
+                    .sendMessage(new EmbedBuilder()
+                            .setColor(new Color(0x800080))
+                            .setDescription(String.format(Config.welcomeMessage, String.format("%s(%s)", name, event.getAuthor().getAsMention())))
+                            .setAuthor(event.getAuthor().getName(), null, event.getAuthor().getEffectiveAvatarUrl())
+                            .build()).queue();
         }
         if (oldAccount != null) {
             if (UserMapping.isInUse(oldAccount)) {
