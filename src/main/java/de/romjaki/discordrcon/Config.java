@@ -19,6 +19,7 @@ public class Config {
     public static String token;
     public static List<String> admins;
     public static boolean selfInvite;
+    public static List<String> selfInviteRoles;
 
     static {
         try (Scanner s = new Scanner(new File("config.json")).useDelimiter("\\A")) {
@@ -37,5 +38,8 @@ public class Config {
 
         temp.forEach(o -> admins.add(o.toString()));
         selfInvite = config.getBoolean("selfinvite");
+        temp = discord.getJSONArray("selfinviteroles");
+        selfInviteRoles = new ArrayList<>();
+        temp.forEach(o -> selfInviteRoles.add(o.toString()));
     }
 }

@@ -10,6 +10,11 @@ import static de.romjaki.discordrcon.Util.*;
 public class AddUserCommand implements Command {
     @Override
     public void execute(MessageReceivedEvent event, String[] args) {
+        if (args.length < 2) {
+            sendEmbed(event.getChannel(), "Missing an argument",
+                    "Usage: adduser <user>", Color.RED, event.getAuthor());
+            return;
+        }
         String name = args[1];
         String oldAccount = UserMapping.replaceMinecraftUserName(event.getAuthor(), name);
         if (name.equals(oldAccount)) {

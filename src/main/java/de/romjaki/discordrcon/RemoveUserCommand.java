@@ -25,8 +25,8 @@ public class RemoveUserCommand implements Command {
                     e.printStackTrace();
                     return;
                 }
-                sendEmbed(event.getChannel(), String.format("Successfully removed %ss Minecraft account %s",
-                        user.getAsMention(), accountName), "", Color.GREEN, user);
+                sendEmbed(event.getChannel(), String.format("Successfully removed %s#%ss Minecraft account %s",
+                        user.getName(), user.getDiscriminator(), accountName), "", Color.GREEN, user);
             } else {
                 sendEmbed(event.getChannel(), String.format("Removed account bindings from User %s to " +
                                 "Minecraft account %s", user.getName() + '#' + user.getDiscriminator(), accountName),

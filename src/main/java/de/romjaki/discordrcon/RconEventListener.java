@@ -1,14 +1,19 @@
 package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.romjaki.discordrcon.UserMapping.isInUse;
+import static de.romjaki.discordrcon.UserMapping.removeUserName;
 import static de.romjaki.discordrcon.Util.sendEmbed;
+import static de.romjaki.discordrcon.Util.testUserRoles;
 
 public class RconEventListener extends ListenerAdapter {
     @PublicAPI
@@ -22,7 +27,23 @@ public class RconEventListener extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
-        System.out.println("Ready");
+        System.out.println("Ready as " + event.getJDA().getSelfUser().getName());
+    }
+
+    @Override
+    public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
+        if (!testUserRoles(event.getMember())) {
+            String mcUser = removeUserName(event.getUser());
+            if (mcUser != null) {
+                if (!isInUse(mcUser)) {
+                    try {
+                        Util.whitelist("remove", mcUser);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -39,11 +60,6 @@ public class RconEventListener extends ListenerAdapter {
         if (!commands.keySet().contains(commandName)) {
             return;
         }
-        if (arr.length < 2) {
-            sendEmbed(event.getChannel(), "Missing an argument",
-                    String.format("Usage: %s <user>", arr[0]), Color.RED, event.getAuthor());
-            return;
-        }
         Command command = commands.get(commandName);
         if (command == null) {
             return;
@@ -54,7 +70,8 @@ public class RconEventListener extends ListenerAdapter {
             return;
         }
 
-        if (command.requiresAdminOrSelfInvite() && !(Util.isUserAdmin(event.getAuthor()) || Config.selfInvite)) {
+        if (command.requiresAdminOrSelfInvite() && !(Util.isUserAdmin(event.getAuthor()) ||
+                (Config.selfInvite && Util.testUserRoles(event.getMember())))) {
             Util.sendPermissionMessage(event.getChannel(), event.getAuthor());
             return;
         }

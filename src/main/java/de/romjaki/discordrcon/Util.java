@@ -1,11 +1,14 @@
 package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.ISnowflake;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -28,7 +31,7 @@ public class Util {
     @PublicAPI
     public static void sendPermissionMessage(MessageChannel channel, User author) {
         sendEmbed(channel, "You are lacking permissions",
-                "You need to be an admin in order to perform that command.", Color.RED, author);
+                "You need special roles to perform that command.", Color.RED, author);
     }
 
 
@@ -47,5 +50,18 @@ public class Util {
     public static void showIOErrorMessage(MessageChannel channel, User author) {
         Util.sendEmbed(channel, "Unknown Network error occured", "Check your console.",
                 Color.RED, author);
+    }
+
+    @PublicAPI
+    public static boolean testUserRoles(Member member) {
+        return Config.selfInviteRoles.stream()
+                .map(role -> member
+                        .getRoles()
+                        .stream()
+                        .map(ISnowflake::getId)
+                        .collect(Collectors.toList())
+                        .contains(role)
+                )
+                .reduce((a, b) -> a | b).orElse(true);
     }
 }
