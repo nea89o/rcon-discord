@@ -10,6 +10,9 @@ buildscript {
 }
 
 apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: 'application'
+
+mainClassName = 'de.romjaki.discordrcon.Main'
 
 group 'de.romjaki'
 version '1.0-SNAPSHOT'
