@@ -5,6 +5,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -22,6 +24,8 @@ public class Config {
     public static List<String> selfInviteRoles;
     public static String prefix;
     public static String welcomeMessage;
+
+    public static Path whitelistFile;
 
     static {
         try (Scanner s = new Scanner(new File("config.json")).useDelimiter("\\A")) {
@@ -44,5 +48,9 @@ public class Config {
         temp = discord.getJSONArray("selfinviteroles");
         selfInviteRoles = new ArrayList<>();
         temp.forEach(o -> selfInviteRoles.add(o.toString()));
+        whitelistFile = FileSystems.getDefault().getPath(config.getString("whitelistfile"));
+        if (whitelistFile.toFile().isDirectory()) {
+            whitelistFile = whitelistFile.resolve("whitelist.json");
+        }
     }
 }

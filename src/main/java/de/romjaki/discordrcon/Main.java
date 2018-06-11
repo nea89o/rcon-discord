@@ -12,17 +12,14 @@ import java.io.IOException;
 public class Main {
 
     public static JDA jda;
-    public static Rcon rcon;
 
     public static void main(String[] args) {
         try {
-            rcon = new Rcon(Config.host, Config.port, Config.password.getBytes());
+            new Rcon(Config.host, Config.port, Config.password.getBytes()).disconnect();
         } catch (IOException e) {
             System.err.println("RCON: Failed to connect to remote host");
-            System.exit(1);
         } catch (AuthenticationException e) {
             System.err.println("RCON: Failed to authentificate on remote host");
-            System.exit(1);
         }
 
         try {

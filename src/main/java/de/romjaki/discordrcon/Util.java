@@ -5,13 +5,18 @@ import net.dv8tion.jda.core.entities.ISnowflake;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
+import net.kronos.rkon.core.Rcon;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
-import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -41,19 +46,11 @@ public class Util {
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 
-        int responseCode = con.getResponseCode();
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+        try (Scanner sc = new Scanner(con.getInputStream()).useDelimiter("\\A")) {
+            return sc.next();
+        } catch (NoSuchElementException e) {
+            return null;
         }
-        in.close();
-
-        return response.toString();
     }
 
     public static void sendEmbed(MessageChannel channel, String title, String description, Color color, User user) {
@@ -80,8 +77,30 @@ public class Util {
 
     @PublicAPI
     public static void whitelist(String action, String name) throws IOException {
-        Main.rcon.command(String.format("whitelist %s %s", action, name));
-        Main.rcon.command("whitelist reload");
+        UUID uuid = UserMapping.resolveMinecraftUser(name);
+        try {
+            Rcon rcon = new Rcon(Config.host, Config.port, Config.password.getBytes());
+            rcon.command(String.format("whitelist %s %s", action, name));
+            rcon.command("whitelist reload");
+        } catch (Exception e) {
+            System.err.println("[RCON] Connection failed! We will manually " + action + " the user " + name);
+            JSONArray arr = new JSONArray(new Scanner(Config.whitelistFile.toFile()).useDelimiter("\\A").next());
+            for (int i = arr.length() - 1; i >= 0; i--) {
+                JSONObject obj = arr.getJSONObject(i);
+                if (obj.getString("uuid").equalsIgnoreCase(uuid.toString())) {
+                    arr.remove(i);
+                }
+            }
+            if (action.equals("add")) {
+                JSONObject userEntry = new JSONObject();
+                userEntry.put("name", name);
+                userEntry.put("uuid", uuid.toString());
+                arr.put(userEntry);
+            }
+            try (FileWriter writer = new FileWriter(Config.whitelistFile.toFile())) {
+                writer.write(arr.toString());
+            }
+        }
     }
 
     @PublicAPI
