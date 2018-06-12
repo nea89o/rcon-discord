@@ -1,6 +1,7 @@
 package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -8,7 +9,6 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import static de.romjaki.discordrcon.UserMapping.isInUse;
 import static de.romjaki.discordrcon.UserMapping.removeUserName;
@@ -22,6 +22,7 @@ public class RconEventListener extends ListenerAdapter {
         commands.put("link", new AddUserCommand());
         commands.put("query", new QueryUser());
         commands.put("unlink", new RemoveUserCommand());
+        commands.put("querymc", new QueryMcUser());
     }
 
     @Override
@@ -30,18 +31,29 @@ public class RconEventListener extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
+        super.onGuildMemberLeave(event);
+        String mcUser = removeUserName(event.getUser());
+        tryRemoveUser(mcUser);
+    }
+
+    private void tryRemoveUser(String mcUser) {
+        if (mcUser != null) {
+            if (!isInUse(mcUser)) {
+                try {
+                    Util.whitelist("remove", mcUser);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
     public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
         if (!testUserRoles(event.getMember())) {
             String mcUser = removeUserName(event.getUser());
-            if (mcUser != null) {
-                if (!isInUse(mcUser)) {
-                    try {
-                        Util.whitelist("remove", mcUser);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+            tryRemoveUser(mcUser);
         }
     }
 
@@ -79,6 +91,8 @@ public class RconEventListener extends ListenerAdapter {
         }
 
         command.execute(event, arr);
+
+        event.getMessage().delete().queue();
     }
 
 }
