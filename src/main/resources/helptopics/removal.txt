@@ -1,0 +1,3 @@
+**Role Removal**
+
+In case of role removal or guild leave, it is checked whether the user still has all the required roles. If not, he will be unlinked and de-whitelisted.

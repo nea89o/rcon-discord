@@ -1,0 +1,6 @@
+**Contact**
+
+[Github](http://github.com/romangraef/rcon-discord)
+[Bug Reports](https://github.com/romangraef/rcon-discord/issues/)
+
+Or contact <@310702108997320705> directly on discord.

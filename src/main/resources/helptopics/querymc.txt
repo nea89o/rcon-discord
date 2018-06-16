@@ -1,0 +1,3 @@
+`querymc <mcuser>`
+
+see which discord users have linked this minecraft user. this may return multiple or no users at all. useful for finding that troll on your sub server.

@@ -1,0 +1,3 @@
+`query <@discord-user>`
+
+see which minecraft user is linked to a discord user. this command is not limited in any way.

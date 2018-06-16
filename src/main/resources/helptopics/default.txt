@@ -1,0 +1,14 @@
+**Commands**
+`help [topic]` - show info about a help topic
+`help [command]` - show more info about a command
+
+`link <mcuser>` - link your minecraft user to your discord account. this can be limited to a certain set of roles
+`query <@discord-user>` - see which minecraft user is linked to a discord user
+`querymc <mcuser>` - see which discord users have linked this minecraft user
+
+-> See also: `help admin`
+
+**FAQ Topics**
+Role removal: `help removal`
+Username change: `help uuid`
+Developer contact and bug reports: `help contact`

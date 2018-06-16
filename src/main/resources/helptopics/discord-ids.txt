@@ -1,0 +1,6 @@
+**Ids**
+
+Ids uniquely identify something in discord. Bots only use ids, so name changes don't affect the internals of the bot.
+
+To get the id of a user @mention them with a `\` in front of the mention.
+To get the id of a role @mention the role with a `\` in front of the mention.

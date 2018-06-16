@@ -23,6 +23,7 @@ public class RconEventListener extends ListenerAdapter {
         commands.put("query", new QueryUser());
         commands.put("unlink", new RemoveUserCommand());
         commands.put("querymc", new QueryMcUser());
+        commands.put("help", new HelpCommand());
     }
 
     @Override

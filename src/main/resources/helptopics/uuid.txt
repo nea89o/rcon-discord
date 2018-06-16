@@ -1,0 +1,4 @@
+**UUIDs**
+
+UUIDs are mojangs way of identifying a user. Those are bound per account and do NOT change on name change. I use UUIDs internally in order to prevent users from changing usernames in order to stay whitelisted after the role has been removed.
+

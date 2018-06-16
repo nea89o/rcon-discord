@@ -1,0 +1,3 @@
+`link <mcuser>`
+
+link your minecraft user to your discord account. this can be limited to a certain set of roles. this will also unlink previously connected accounts (de-whitelisting them) in the process.
