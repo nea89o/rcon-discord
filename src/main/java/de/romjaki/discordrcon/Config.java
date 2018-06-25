@@ -24,6 +24,7 @@ public class Config {
     public static List<String> selfInviteRoles;
     public static String prefix;
     public static String welcomeMessage;
+    public static List<String> bannedRoles;
 
     public static Path whitelistFile;
 
@@ -44,10 +45,17 @@ public class Config {
         admins = new ArrayList<>();
         welcomeMessage = discord.getString("welcomemessage");
         temp.forEach(o -> admins.add(o.toString()));
+
         selfInvite = config.getBoolean("selfinvite");
+
         temp = discord.getJSONArray("selfinviteroles");
         selfInviteRoles = new ArrayList<>();
         temp.forEach(o -> selfInviteRoles.add(o.toString()));
+
+        temp = discord.getJSONArray("bannedroles");
+        bannedRoles = new ArrayList<>();
+        temp.forEach(o -> bannedRoles.add(o.toString()));
+
         whitelistFile = FileSystems.getDefault().getPath(config.getString("whitelistfile"));
         if (whitelistFile.toFile().isDirectory()) {
             whitelistFile = whitelistFile.resolve("whitelist.json");

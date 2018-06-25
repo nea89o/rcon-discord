@@ -82,6 +82,9 @@ public class Util {
             Rcon rcon = new Rcon(Config.host, Config.port, Config.password.getBytes());
             rcon.command(String.format("whitelist %s %s", action, name));
             rcon.command("whitelist reload");
+            if (action.equals("remove")) {
+                rcon.command("kick " + name);
+            }
         } catch (Exception e) {
             System.err.println("[RCON] Connection failed! We will manually " + action + " the user " + name);
             JSONArray arr = new JSONArray(new Scanner(Config.whitelistFile.toFile()).useDelimiter("\\A").next());
@@ -119,6 +122,15 @@ public class Util {
                         .collect(Collectors.toList())
                         .contains(role)
                 )
-                .reduce((a, b) -> a | b).orElse(true);
+                .reduce(Boolean::logicalOr).orElse(true)
+                &&
+                !Config.bannedRoles.stream()
+                        .map(role -> member
+                                .getRoles()
+                                .stream()
+                                .map(ISnowflake::getId)
+                                .collect(Collectors.toList())
+                                .contains(role)
+                        ).reduce(Boolean::logicalOr).orElse(false);
     }
 }
