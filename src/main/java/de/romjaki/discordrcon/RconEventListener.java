@@ -1,7 +1,9 @@
 package de.romjaki.discordrcon;
 
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -12,6 +14,7 @@ import java.util.Map;
 
 import static de.romjaki.discordrcon.UserMapping.isInUse;
 import static de.romjaki.discordrcon.UserMapping.removeUserName;
+import static de.romjaki.discordrcon.Util.hasBannedRole;
 import static de.romjaki.discordrcon.Util.testUserRoles;
 
 public class RconEventListener extends ListenerAdapter {
@@ -24,6 +27,8 @@ public class RconEventListener extends ListenerAdapter {
         commands.put("unlink", new RemoveUserCommand());
         commands.put("querymc", new QueryMcUser());
         commands.put("help", new HelpCommand());
+        commands.put("unban", new UnbanCommand());
+        commands.put("ban", new BanCommmand());
     }
 
     @Override
@@ -51,10 +56,29 @@ public class RconEventListener extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+        super.onGuildMemberJoin(event);
+        if (BlackList.getBlacklistUsers().contains(event.getMember().getUser().getId())) {
+            event.getGuild().getController().addRolesToMember(event.getMember(),
+                    event.getGuild().getRoleById(Config.bannedRole)).queue();
+        }
+    }
+
+    @Override
     public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
         if (!testUserRoles(event.getMember())) {
             String mcUser = removeUserName(event.getUser());
             tryRemoveUser(mcUser);
+        }
+        if (!hasBannedRole(event.getMember())) {
+            BlackList.removeBlacklistUser(event.getMember().getUser().getId());
+        }
+    }
+
+    @Override
+    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+        if (hasBannedRole(event.getMember())) {
+            BlackList.addBlacklistUser(event.getMember().getUser().getId());
         }
     }
 
@@ -79,7 +103,7 @@ public class RconEventListener extends ListenerAdapter {
         if (command == null) {
             return;
         }
-
+        event.getMessage().delete().queue();
         if (command.requiresAdmin() && !Util.isUserAdmin(event.getAuthor())) {
             Util.sendPermissionMessage(event.getChannel(), event.getAuthor());
             return;
@@ -90,10 +114,11 @@ public class RconEventListener extends ListenerAdapter {
             Util.sendPermissionMessage(event.getChannel(), event.getAuthor());
             return;
         }
-
-        command.execute(event, arr);
-
-        event.getMessage().delete().queue();
+        try {
+            command.execute(event, arr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

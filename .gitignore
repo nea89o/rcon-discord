@@ -4,3 +4,4 @@ build/
 .gradle/
 config.json
 users.json
+discord-blacklist.txt

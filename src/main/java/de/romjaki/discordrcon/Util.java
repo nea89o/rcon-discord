@@ -114,6 +114,12 @@ public class Util {
 
     @PublicAPI
     public static boolean testUserRoles(Member member) {
+        return hasSelfInviteRole(member) &&
+                !hasBannedRole(member);
+    }
+
+    @PublicAPI
+    public static boolean hasSelfInviteRole(Member member) {
         return Config.selfInviteRoles.stream()
                 .map(role -> member
                         .getRoles()
@@ -122,15 +128,15 @@ public class Util {
                         .collect(Collectors.toList())
                         .contains(role)
                 )
-                .reduce(Boolean::logicalOr).orElse(true)
-                &&
-                !Config.bannedRoles.stream()
-                        .map(role -> member
-                                .getRoles()
-                                .stream()
-                                .map(ISnowflake::getId)
-                                .collect(Collectors.toList())
-                                .contains(role)
-                        ).reduce(Boolean::logicalOr).orElse(false);
+                .reduce(Boolean::logicalOr).orElse(true);
+    }
+
+
+    @PublicAPI
+    public static boolean hasBannedRole(Member member) {
+        return member.getRoles().stream()
+                .map(ISnowflake::getId)
+                .collect(Collectors.toList())
+                .contains(Config.bannedRole);
     }
 }
