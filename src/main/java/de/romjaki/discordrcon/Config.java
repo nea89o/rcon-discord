@@ -19,7 +19,7 @@ public class Config {
     public static String host;
     public static JSONObject discord;
     public static String token;
-    public static List<String> admins;
+    public static List<String> adminRoles;
     public static boolean selfInvite;
     public static List<String> selfInviteRoles;
     public static String prefix;
@@ -42,9 +42,9 @@ public class Config {
         token = discord.getString("token");
         prefix = discord.getString("prefix");
         JSONArray temp = discord.getJSONArray("admins");
-        admins = new ArrayList<>();
+        adminRoles = new ArrayList<>();
         welcomeMessage = discord.getString("welcomemessage");
-        temp.forEach(o -> admins.add(o.toString()));
+        temp.forEach(o -> adminRoles.add(o.toString()));
 
         selfInvite = config.getBoolean("selfinvite");
 

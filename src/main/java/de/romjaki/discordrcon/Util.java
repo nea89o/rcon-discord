@@ -71,8 +71,16 @@ public class Util {
     }
 
     @PublicAPI
-    public static boolean isUserAdmin(User user) {
-        return Config.admins.contains(user.getId());
+    public static boolean isUserAdmin(Member member) {
+        return Config.adminRoles.stream()
+                .map(role -> member
+                        .getRoles()
+                        .stream()
+                        .map(ISnowflake::getId)
+                        .collect(Collectors.toList())
+                        .contains(role)
+                )
+                .reduce(Boolean::logicalOr).orElse(false);
     }
 
     @PublicAPI

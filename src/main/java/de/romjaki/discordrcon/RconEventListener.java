@@ -104,12 +104,12 @@ public class RconEventListener extends ListenerAdapter {
             return;
         }
         event.getMessage().delete().queue();
-        if (command.requiresAdmin() && !Util.isUserAdmin(event.getAuthor())) {
+        if (command.requiresAdmin() && !Util.isUserAdmin(event.getMember())) {
             Util.sendPermissionMessage(event.getChannel(), event.getAuthor());
             return;
         }
 
-        if (command.requiresAdminOrSelfInvite() && !(Util.isUserAdmin(event.getAuthor()) ||
+        if (command.requiresAdminOrSelfInvite() && !(Util.isUserAdmin(event.getMember()) ||
                 (Config.selfInvite && Util.testUserRoles(event.getMember())))) {
             Util.sendPermissionMessage(event.getChannel(), event.getAuthor());
             return;
