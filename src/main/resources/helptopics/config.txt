@@ -5,18 +5,20 @@
     "port": 25575,
     "password": "Passwort1234"
   },
-  "whitelistfile": "/path/to/your/minecraft/server",
+  "kickmessage": "§8HALLOHL",
+  "whitelistfile": "/home/romangraef/mcserver1.12.2/",
   "selfinvite": true,
   "discord": {
-    "welcomemessage": "%s has registered themselves.",
+    "welcomemessage": "🔮 %s ist jetzt bei NoGravity mit dabei! Hurra!",
     "prefix": "!",
     "admins": [
-      "310702108997320705"
+      "admin roles"
     ],
-    "token": "CENSORED",
+    "token": "TOKEN",
     "selfinviteroles": [
-      "ROLES"
-    ]
+      "self invite roles"
+    ],
+    "bannedrole": "ONE SINGLE BAN ROLE"
   }
 }```
 the rcon parameters are set in the `server.properties` of your minecraft server.
@@ -24,8 +26,9 @@ the `whitelistfile` parameter is for setting the whitelist while being offline
 turn on `selfinvite`if people other than admins should be able to link accounts (mostly wanted)
 the `welcomemessage` is the only message that will be left to indicate who linked an account. use %s as replacement for the username
 the `prefix` is the prefix for your bot
-the `admins` are the persons who can use admin commands like `!unlink` (or `!link` if `selfinvite` is `false`). those are ids. see `help discord-ids`
+the `admins` are the roles who can use admin commands like `!unlink` (or `!link` if `selfinvite` is `false`). those are ids. see `help discord-ids`
 the `token` is the token of your bot user. Seek help over at the [Discord Developer Page](https://discordapp.com/developers/applications/me)
 the `selfinviteroles` are the roles who should be able to use `!link` (if `selfinvite` is `true`). Leave empty to ignore. those are ids. see `help discord-ids`
+the `bannedrole` is a role which indicated that a user isn't allowed to register despite having the selfinviterole.
 
 If you still have problems, see `help contact`

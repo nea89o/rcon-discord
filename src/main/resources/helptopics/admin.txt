@@ -1,4 +1,6 @@
 **Admin commands**
 `!unlink <@discord-user>` - unlink a discord user form his minecraft user, de-whitelisting his account. this does not block them from registering a new account.
+`!ban <@discord-users>` - ban some discord users from using the whitelist
+`!unban <@discord-users>` - unban those discord users from the blacklist
 
 For config information see `help config`

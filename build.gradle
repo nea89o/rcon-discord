@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
     compile group: 'org.json', name: 'json', version: '20171018'
-    compile 'net.dv8tion:JDA:3.5.0_327'
+    compile 'net.dv8tion:JDA:3.6.0_376'
     compile fileTree(dir: 'libs', includes: ['*.jar'])
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

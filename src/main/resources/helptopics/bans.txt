@@ -1,0 +1,2 @@
+**Bans**
+You can be banned from using the whitelist by an admin. This will overwrite even if you have permissions to self-invite. Bans last even after you leave and rejoin the server, unlike normal roles.

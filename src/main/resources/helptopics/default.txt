@@ -12,3 +12,4 @@
 Role removal: `help removal`
 Username change: `help uuid`
 Developer contact and bug reports: `help contact`
+Bans: `help bans`
