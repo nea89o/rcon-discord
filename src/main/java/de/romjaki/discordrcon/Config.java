@@ -25,7 +25,7 @@ public class Config {
     public static String prefix;
     public static String welcomeMessage;
     public static List<String> bannedRoles;
-
+    public static String kickMessage;
     public static Path whitelistFile;
 
     static {
@@ -56,6 +56,8 @@ public class Config {
         bannedRoles = new ArrayList<>();
         temp.forEach(o -> bannedRoles.add(o.toString()));
 
+        kickMessage = config.getString("kickmessage");
+        
         whitelistFile = FileSystems.getDefault().getPath(config.getString("whitelistfile"));
         if (whitelistFile.toFile().isDirectory()) {
             whitelistFile = whitelistFile.resolve("whitelist.json");

@@ -83,7 +83,7 @@ public class Util {
             rcon.command(String.format("whitelist %s %s", action, name));
             rcon.command("whitelist reload");
             if (action.equals("remove")) {
-                rcon.command("kick " + name);
+                rcon.command("kick " + name + " " + Config.kickMessage);
             }
         } catch (Exception e) {
             System.err.println("[RCON] Connection failed! We will manually " + action + " the user " + name);
