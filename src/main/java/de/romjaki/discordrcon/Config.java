@@ -26,7 +26,7 @@ public class Config {
     public static String welcomeMessage;
     public static String bannedRole;
     public static String kickMessage;
-    public static Path whitelistFile;
+    public static Path whitelistFile = null;
 
     static {
         try (Scanner s = new Scanner(new File("config.json")).useDelimiter("\\A")) {
@@ -43,7 +43,7 @@ public class Config {
         prefix = discord.getString("prefix");
         JSONArray temp = discord.getJSONArray("admins");
         adminRoles = new ArrayList<>();
-        welcomeMessage = discord.getString("welcomemessage");
+        welcomeMessage = config.getString("welcomemessage");
         temp.forEach(o -> adminRoles.add(o.toString()));
 
         selfInvite = config.getBoolean("selfinvite");
@@ -55,10 +55,11 @@ public class Config {
         bannedRole = discord.getString("bannedrole");
 
         kickMessage = config.getString("kickmessage");
-
-        whitelistFile = FileSystems.getDefault().getPath(config.getString("whitelistfile"));
-        if (whitelistFile.toFile().isDirectory()) {
-            whitelistFile = whitelistFile.resolve("whitelist.json");
+        if (config.has("whitelistfile")) {
+            whitelistFile = FileSystems.getDefault().getPath(config.getString("whitelistfile"));
+            if (whitelistFile.toFile().isDirectory()) {
+                whitelistFile = whitelistFile.resolve("whitelist.json");
+            }
         }
     }
 }

@@ -1,26 +1,28 @@
 ```json
 {
   "rcon": {
-    "server": "localhost",
-    "port": 25575,
-    "password": "Passwort1234"
+    "server": "YOUR MINECRAFT SERVER",
+    "port": 25575 /*or whatever rcon port you are using. look into your server.properties */,
+    "password": "RCON-PASSWORD" /* yet again -> server.properties */
   },
-  "kickmessage": "§8HALLOHL",
-  "whitelistfile": "/home/romangraef/mcserver1.12.2/",
-  "selfinvite": true,
+  "selfinvite": true, /* Whether user can use this or only admins. */
   "discord": {
-    "welcomemessage": "🔮 %s ist jetzt bei NoGravity mit dabei! Hurra!",
-    "prefix": "!",
     "admins": [
-      "admin roles"
+      "YOUR DISCORD USER ID. Find out using Developer mode.",
+      "A SECOND ID"
     ],
-    "token": "TOKEN",
+    "prefix": "/",
+    "token": "Your bots token. Create one over at https://discordapp.com/developers/applications/me",
     "selfinviteroles": [
-      "self invite roles"
+      "a role id" /* Limit which roles can invite themselves */
     ],
-    "bannedrole": "ONE SINGLE BAN ROLE"
-  }
-}```
+    "bannedrole": "another role id" /* This role is banned from using self invites, even if they have the self invite role*/
+  },
+  "kickmessage": "This message is sent to minecrafters when they are kicked",
+  "welcomemessage": "This message is sent in the discord server to welcome newly linked accounts. Use %s as a placeholder for the username",
+  "whitelistfile": "/path/to/your/minecraft/installation" /* This is used if the server is offline. Optional */
+}
+```
 the rcon parameters are set in the `server.properties` of your minecraft server.
 the `whitelistfile` parameter is for setting the whitelist while being offline
 turn on `selfinvite`if people other than admins should be able to link accounts (mostly wanted)

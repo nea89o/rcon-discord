@@ -22,7 +22,7 @@ This bot adds to commands to your discord server.
 - Head to over to [Release][1] and Download the latest `.jar` file
 - In the directory you want to run the bot. Create a `config.json` with the following content: 
 
-```json
+```json5
 {
   "rcon": {
     "server": "YOUR MINECRAFT SERVER",
@@ -35,8 +35,16 @@ This bot adds to commands to your discord server.
       "YOUR DISCORD USER ID. Find out using Developer mode.",
       "A SECOND ID"
     ],
-    "token": "Your bots token. Create one over at https://discordapp.com/developers/applications/me"
-  }
+    "prefix": "/",
+    "token": "Your bots token. Create one over at https://discordapp.com/developers/applications/me",
+    "selfinviteroles": [
+      "a role id" /* Limit which roles can invite themselves */
+    ],
+    "bannedrole": "another role id" /* This role is banned from using self invites, even if they have the self invite role*/
+  },
+  "kickmessage": "This message is sent to minecrafters when they are kicked",
+  "welcomemessage": "This message is sent in the discord server to welcome newly linked accounts. Use %s as a placeholder for the username",
+  "whitelistfile": "/path/to/your/minecraft/installation" /* This is used if the server is offline. Optional */
 }
 ```
 -  After that run the jar using double click or `java -jar <filename.jar>`
