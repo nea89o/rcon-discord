@@ -1,9 +1,9 @@
-name: Java CI with Gradle
+name: Java CI with Gradle and Auto release
 
 on:
   push:
-    branches: [ release ]
-
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
   build:
 
@@ -19,7 +19,23 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew shadowJar
-      - name: Push release Jar
-        uses: yakuhzi/action-release@v1.2.0
+      - name: Create Release
+        uses: actions/create-release@v1
+        id: create_release
         with:
-          file: build/libs/rcon-discord.jar
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Shadow Jar
+        id: upload-shadow-jar
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/libs/rcon-discord.jar
+          asset_name: rcon-discord.jar
+          asset_content_type: application/java-archive
